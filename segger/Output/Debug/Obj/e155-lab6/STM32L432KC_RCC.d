@@ -1,4 +1,4 @@
-Output/Debug/Obj/Executable_1/STM32L432KC_RCC.o: \
+Output/Debug/Obj/e155-lab6/STM32L432KC_RCC.o: \
  C:\Users\mdesomma\Documents\e155-lab6\mcu\lib\STM32L432KC_RCC.c \
  C:\Users\mdesomma\Documents\e155-lab6\mcu\lib\STM32L432KC_RCC.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ 8.16/include/stdint.h \

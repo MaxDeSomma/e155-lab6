@@ -1,2 +1,2 @@
-Output/Debug/Obj/Executable_1/STM32L4xx_Startup.o: \
+Output/Debug/Obj/e155-lab6/STM32L4xx_Startup.o: \
  C:\Users\mdesomma\Documents\e155-lab6\segger\STM32L4xx\Source\STM32L4xx_Startup.s

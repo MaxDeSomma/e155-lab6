@@ -22,6 +22,13 @@ char* webpageStart = "<!DOCTYPE html><html><head><title>E155 Web Server Demo Web
 	<body><h1>E155 Web Server Demo Webpage</h1>";
 char* ledStr = "<p>LED Control:</p><form action=\"ledon\"><input type=\"submit\" value=\"Turn the LED on!\"></form>\
 	<form action=\"ledoff\"><input type=\"submit\" value=\"Turn the LED off!\"></form>";
+
+char* tempStr = "<p>Temperature Resolution Control:</p><form action=\"8bit\"><input type=\"submit\" value=\"8 Bit!\"></form>\
+	<form action=\"9bit\"><input type=\"submit\" value=\"9 Bit!\"></form>\
+        <form action=\"10bit\"><input type=\"submit\" value=\"10 Bit!\"></form>\
+        <form action=\"11bit\"><input type=\"submit\" value=\"11 Bit!\"></form>\
+        <form action=\"12bit\"><input type=\"submit\" value=\"12 Bit!\"></form>";
+
 char* webpageEnd   = "</body></html>";
 
 //determines whether a given character sequence is in a char array request, returning 1 if present, -1 if not present
@@ -46,11 +53,88 @@ int updateLEDStatus(char request[])
 	return led_status;
 }
 
+
+
 /////////////////////////////////////////////////////////////////
 // Solution Functions
 /////////////////////////////////////////////////////////////////
+float decodeTemp(uint8_t lsb, uint8_t msb) {
+  int8_t wholeNumberTemp = 0;
+  if(msb>>7 == 1){
+    wholeNumberTemp = -128+(msb & 0x7F);
+  } else {
+    wholeNumberTemp = (msb & 0x7F);
+  }
+  
+  double decimalTemp = 0.0;
+  if (lsb & 0x80) {
+    decimalTemp += 0.5;
+  }
+  if (lsb & 0x40) {
+    decimalTemp += 0.25;
+  }
+  if (lsb & 0x20) {
+    decimalTemp += 0.125;
+  }
+  if (lsb & 0x10) {
+    decimalTemp += 0.0625;
+  }
+
+  return decimalTemp + (double)wholeNumberTemp;
+}
+
+float updateTemperature(char request[]) {
+  uint8_t lsbTemp = 0;
+  uint8_t msbTemp = 0;
+
+  if (inString(request, "8bit")==1) {
+    digitalWrite(PB3, 1);
+    spiSendReceive(0x80);  
+    spiSendReceive(0b11100000);
+    digitalWrite(PB3, 0);
+  }
+  else if (inString(request, "9bit")==1) {
+    digitalWrite(PB3, 1);
+    spiSendReceive(0x80);  
+    spiSendReceive(0b11100010);
+    digitalWrite(PB3, 0);
+  }
+  else if (inString(request, "10bit")==1) {
+    digitalWrite(PB3, 1);
+    spiSendReceive(0x80);  
+    spiSendReceive(0b11100100);
+    digitalWrite(PB3, 0);
+  }
+  else if (inString(request, "11bit")==1) {
+    digitalWrite(PB3, 1);
+    spiSendReceive(0x80);  
+    spiSendReceive(0b11100110);
+    digitalWrite(PB3, 0);
+  }
+  else if (inString(request, "12bit")==1) {
+    digitalWrite(PB3, 1);
+    spiSendReceive(0x80);  
+    spiSendReceive(0b11101110);
+    digitalWrite(PB3, 0);
+  }
+  
+    digitalWrite(PB3, 1);
+    spiSendReceive(0x01);
+    lsbTemp = spiSendReceive(0x00);
+    digitalWrite(PB3, 0);
+
+    digitalWrite(PB3, 1);
+    spiSendReceive(0x02);
+    msbTemp = spiSendReceive(0x00);
+    digitalWrite(PB3, 0);
+    
+    return decodeTemp(lsbTemp,msbTemp);
+}
 
 int main(void) {
+
+  double temp = 0;
+
   configureFlash();
   configureClock();
 
@@ -58,7 +142,7 @@ int main(void) {
   gpioEnable(GPIO_PORT_B);
   gpioEnable(GPIO_PORT_C);
 
-  pinMode(PB3, GPIO_OUTPUT);
+  pinMode(PB0, GPIO_OUTPUT);
   
   RCC->APB2ENR |= (RCC_APB2ENR_TIM15EN);
   initTIM(TIM15);
@@ -66,6 +150,24 @@ int main(void) {
   USART_TypeDef * USART = initUSART(USART1_ID, 125000);
 
   // TODO: Add SPI initialization code
+  //enable GPIO stuff
+  pinMode(PA5, GPIO_ALT); // SPI1_SCK //D1
+  pinMode(PA6, GPIO_ALT); // SPI1_MISO //D0
+  pinMode(PA12, GPIO_ALT); // SPI1_MOSI //D7
+
+    // Configure correct alternate functions
+  GPIOA->AFR[0] |= (0b101 << GPIO_AFRL_AFSEL5_Pos);   //AF5
+  GPIOA->AFR[0] |= (0b101 << GPIO_AFRL_AFSEL6_Pos);   //AF5
+  GPIOA->AFR[1] |= (0b101 << GPIO_AFRH_AFSEL12_Pos);  //AF5
+
+  pinMode(PB3, GPIO_OUTPUT);
+  
+  initSPI(9600, 0, 1);
+
+  digitalWrite(PB3, 1);
+  spiSendReceive(0x80);  
+  spiSendReceive(0b11100100);
+  digitalWrite(PB3, 0);
 
   while(1) {
     /* Wait for ESP8266 to send a request.
@@ -85,7 +187,8 @@ int main(void) {
     }
 
     // TODO: Add SPI code here for reading temperature
-  
+    float currentTemp = updateTemperature(request);
+
     // Update string with current LED state
   
     int led_status = updateLEDStatus(request);
@@ -96,18 +199,26 @@ int main(void) {
     else if (led_status == 0)
       sprintf(ledStatusStr,"LED is off!");
 
+    char temper[30];
+    sprintf(temper,"Temperature: %f C", currentTemp);
+
     // finally, transmit the webpage over UART
     sendString(USART, webpageStart); // webpage header code
     sendString(USART, ledStr); // button for controlling LED
 
+    sendString(USART, tempStr);
+
+    sendString(USART, "<h2>Temperature Reading</h2>");
+    sendString(USART, "<p>");
+    sendString(USART, temper);
+    sendString(USART, "</p>");
+
     sendString(USART, "<h2>LED Status</h2>");
-
-
     sendString(USART, "<p>");
     sendString(USART, ledStatusStr);
     sendString(USART, "</p>");
 
-  
+    
     sendString(USART, webpageEnd);
   }
 }

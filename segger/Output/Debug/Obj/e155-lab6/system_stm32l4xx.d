@@ -1,13 +1,13 @@
-Output/Debug/Obj/Executable_1/STM32L432KC_FLASH.o: \
- C:\Users\mdesomma\Documents\e155-lab6\mcu\lib\STM32L432KC_FLASH.c \
- C:\Users\mdesomma\Documents\e155-lab6\mcu\lib\STM32L432KC_FLASH.h \
+Output/Debug/Obj/e155-lab6/system_stm32l4xx.o: \
+ C:\Users\mdesomma\Documents\e155-lab6\segger\STM32L4xx\Device\Source\system_stm32l4xx.c \
+ C:/Users/mdesomma/Documents/e155-lab6/segger/STM32L4xx/Device/Include/stm32l4xx.h \
+ C:/Users/mdesomma/Documents/e155-lab6/segger/STM32L4xx/Device/Include/stm32l432xx.h \
+ C:/Users/mdesomma/Documents/e155-lab6/segger/CMSIS_5/CMSIS/Core/Include/core_cm4.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ 8.16/include/stdint.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ 8.16/include/__SEGGER_RTL.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ 8.16/include/__SEGGER_RTL_ConfDefaults.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ 8.16/include/__SEGGER_RTL_Conf.h \
  C:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ 8.16/include/__SEGGER_RTL_Arm_Conf.h \
- C:/Users/mdesomma/Documents/e155-lab6/segger/STM32L4xx/Device/Include/stm32l432xx.h \
- C:/Users/mdesomma/Documents/e155-lab6/segger/CMSIS_5/CMSIS/Core/Include/core_cm4.h \
  C:/Users/mdesomma/Documents/e155-lab6/segger/CMSIS_5/CMSIS/Core/Include/cmsis_version.h \
  C:/Users/mdesomma/Documents/e155-lab6/segger/CMSIS_5/CMSIS/Core/Include/cmsis_compiler.h \
  C:/Users/mdesomma/Documents/e155-lab6/segger/CMSIS_5/CMSIS/Core/Include/cmsis_gcc.h \
